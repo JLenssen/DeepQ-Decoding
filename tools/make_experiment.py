@@ -16,7 +16,7 @@ if len(sys.argv) != 2:
 # identifier for training to differentiate between runs at same error rate
 training_id = str(uuid.uuid4())[0:6]
 
-scripts_dir = os.path.join(os.getcwd(), "cluster_scripts", "experiments", "scripts")
+scripts_dir = os.path.join(os.getcwd(), "experiments", "scripts")
 
 config_file = sys.argv[1]
 with open(config_file, 'r') as f:
@@ -27,7 +27,7 @@ config["training_id"] = training_id
 
 
 # 1. Create base directory in /cluster_scripts/experiments
-rootdir = f"cluster_scripts/experiments/{config['config_dir']}"
+rootdir = f"experiments/{config['config_dir']}"
 os.mkdir(rootdir)
 
 # 2. Copy (updated with ID) config file to root
