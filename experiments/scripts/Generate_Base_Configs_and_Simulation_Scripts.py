@@ -93,6 +93,7 @@ python -u {testing_script} {config_counter} || exit 1
 sleep 50'''.format(job_name=job_name,
                 output_file=output_file,
                 error_file=error_file,
+                job_limit=job_limit,
                 training_script=training_script,
                 testing_script=testing_script,
                 config_counter=config_counter))

@@ -14,7 +14,7 @@
     "ff_layers": [[512,0.2]],
     "max_timesteps": 3000000,
     "volume_depth": 7,
-    "testing_length": 501,
+    "testing_length": 201,
     "buffer_size": 100000,
     "dueling": true,
     "masked_greedy": false,

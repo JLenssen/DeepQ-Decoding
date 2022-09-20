@@ -56,6 +56,7 @@ for phy in config["controller_params"]["p_phys_list"]:
   else:
     shutil.copyfile(f"{scripts_dir}/Single_Point_Continue_Training_Script.py", f"{rootdir}/{phy}/Single_Point_Continue_Training_Script.py")
     shutil.copyfile(f"{scripts_dir}/Start_Continuing_Simulations.sh", f"{rootdir}/{phy}/Start_Continuing_Simulations.sh")
+  shutil.copyfile(f"{scripts_dir}/Single_Point_Testing_Script.py", f"{rootdir}/{phy}/Single_Point_Testing_Script.py")
 
 # 4. Move to new working environment
 os.chdir(rootdir)

@@ -284,6 +284,7 @@ python {testing_script} {config_counter} || exit 1'''.format(job_name=job_name,
                                                                            output_file=output_file,
                                                                            error_file=error_file,
                                                                            training_script=training_script,
+                                                                           testing_script=testing_script,
                                                                            config_counter=config_counter))
                                             f.close()
                                             
