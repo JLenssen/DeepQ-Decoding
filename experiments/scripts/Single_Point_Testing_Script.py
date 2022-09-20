@@ -2,12 +2,10 @@
 
 from keras.models import load_model
 from keras.optimizers import Adam
-from keras.callbacks import TensorBoard
 
 from rl.agents.dqn import DQNAgent
-from rl.policy import EpsGreedyQPolicy, LinearAnnealedPolicy, GreedyQPolicy
+from rl.policy import GreedyQPolicy
 from rl.memory import SequentialMemory
-from rl.callbacks import FileLogger, ModelIntervalCheckpoint
 
 import numpy as np
 import tensorflow as tf
@@ -18,7 +16,6 @@ from deepq.Environments import *
 import pickle
 import sys
 import os
-import datetime
 import random
 
 # ---------------------------------------------------------------------------------------------
@@ -71,14 +68,16 @@ env = Surface_Code_Environment_Multi_Decoding_Cycles(d=all_configs["d"],
 
 # -------------------------------------------------------------------------------------------
 
+memory_file = os.path.join(variable_configs_folder, "memory.p")
+final_weights_file = os.path.join(
+    variable_configs_folder, "final_dqn_weights.h5f")
+
+# -------------------------------------------------------------------------------------------
+
 model = build_convolutional_nn(
     all_configs["c_layers"], all_configs["ff_layers"], env.observation_space.shape, env.num_actions)
 memory = SequentialMemory(limit=all_configs["buffer_size"], window_length=1)
-policy = LinearAnnealedPolicy(EpsGreedyQPolicy(masked_greedy=all_configs["masked_greedy"]),
-                              attr='eps', value_max=all_configs["max_eps"],
-                              value_min=all_configs["final_eps"],
-                              value_test=0.0,
-                              nb_steps=all_configs["exploration_fraction"])
+policy = GreedyQPolicy(masked_greedy=True)
 test_policy = GreedyQPolicy(masked_greedy=True)
 
 # ------------------------------------------------------------------------------------------
@@ -95,52 +94,43 @@ dqn = DQNAgent(model=model,
 
 
 dqn.compile(Adam(lr=all_configs["learning_rate"]))
-
-# ---------------------------------------------------------------------------------------------
-
-callbacks = []
-if fixed_configs["use_tensorboard"]:
-  tensorboard_logging_path = os.path.join(
-      base_directory, "tensorboard_logs", "config_"+str(variable_config_number))
-  # Choosing update frequency to be epoch which means that TensorBoard will update after each episode.
-  # TensorBoard is only used to find suitable hyper-parameters and is not needed in actual training.
-  callbacks.append(TensorBoard(log_dir=tensorboard_logging_path,
-                   histogram_freq=0, update_freq='epoch'))
-
-logging_path = os.path.join(variable_configs_folder, "training_history.json")
-callbacks.append(FileLogger(filepath=logging_path,
-                 interval=all_configs["print_freq"]))
-final_weights_path = os.path.join(
-    variable_configs_folder, "final_dqn_weights.h5f")
-callbacks.append(ModelIntervalCheckpoint(filepath=final_weights_path,
-                                         interval=all_configs["save_weight_freq"]
-                                         ))
+dqn.model.load_weights(final_weights_file)
 
 # -------------------------------------------------------------------------------------------
 
-now = datetime.datetime.now()
-started_file = os.path.join(variable_configs_folder, "started_at.p")
-pickle.dump(now, open(started_file, "wb"))
+trained_at = all_configs["p_phys"]
+num_to_test = 20
+error_rates = [j*0.001 for j in range(1, num_to_test + 1)]
+thresholds = [1/p for p in error_rates]
+nb_test_episodes = all_configs["testing_length"]
+all_results = {}
 
-history = dqn.fit(env,
-                  nb_steps=all_configs["max_timesteps"],
-                  action_repetition=1,
-                  callbacks=callbacks,
-                  verbose=2,
-                  visualize=False,
-                  nb_max_start_steps=0,
-                  start_step_policy=None,
-                  log_interval=all_configs["print_freq"],
-                  nb_max_episode_steps=None,
-                  episode_averaging_length=all_configs["rolling_average_length"],
-                  success_threshold=all_configs["success_threshold"],
-                  stopping_patience=all_configs["stopping_patience"],
-                  min_nb_steps=all_configs["exploration_fraction"],
-                  single_cycle=False)
 
-# -------------------------------------------------------------------------------------------
+keep_evaluating = True
+count = 0
+while keep_evaluating:
 
-memory_file = os.path.join(variable_configs_folder, "memory.p")
-pickle.dump(dqn.memory, open(memory_file, "wb"))
+  err_rate = error_rates[count]
+  env.p_phys = err_rate
+  env.p_meas = err_rate
 
-dqn.save_weights(final_weights_path, overwrite=True)
+  dict_key = str(err_rate)[:5]
+
+  testing_history = dqn.test(env, nb_episodes=nb_test_episodes,
+                             visualize=False, verbose=2, interval=10, single_cycle=False)
+  results = testing_history.history["episode_lifetimes_rolling_avg"]
+  final_result = results[-1:][0]
+  all_results[dict_key] = final_result
+
+  if abs(trained_at - err_rate) < 1e-6:
+    results_file = os.path.join(variable_configs_folder, "results.p")
+    pickle.dump(results, open(results_file, "wb"))
+
+  to_beat = thresholds[count]
+  if final_result < to_beat or count == (num_to_test - 1):
+    keep_evaluating = False
+
+  count += 1
+
+all_results_file = os.path.join(variable_configs_folder, "all_results.p")
+pickle.dump(all_results, open(all_results_file, "wb"))

@@ -45,7 +45,7 @@ cwd= os.getcwd()
 now = datetime.datetime.now()
 print(now)                          # This allows us to track executions in stdout
 
-with open('../training_config.json', 'r') as f:
+with open('training_config.json', 'r') as f:
     data = json.load(f)
     parameter_grid = data["controller_params"]["controller_param_grid"]
     controller_params = data["controller_params"]
@@ -244,10 +244,11 @@ if completed_simulations == num_configs:
                                             new_sim_script_path = os.path.join(config_directory, "simulation_script.sh")
 
                                             # Now, write into the bash script exactly what we want to appear there
-                                            python_script = os.path.join(new_p_phys_directory,"Single_Point_Continue_Training_Script.py")
                                             job_name=data["training_id"]+"_"+str(new_p_phys)+"_"+str(config_counter)
                                             output_file = os.path.join(new_p_phys_directory,"output_files/out_"+job_name+".out")
                                             error_file = os.path.join(new_p_phys_directory,"output_files/err_"+job_name+".err")
+                                            training_script = os.path.join(new_p_phys_directory,"Single_Point_Continue_Training_Script.py")
+                                            testing_script = os.path.join(new_p_phys_directory,"Single_Point_Testing_Script.py")
 
                                             f = open(new_sim_script_path,"w")                  
                                             f.write('''#!/bin/bash
@@ -276,13 +277,14 @@ source activate deepq-mkl
 export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 
 # ------- run the script -----------------------
-
-python {python_script} {config_counter} {new_p_phys_directory} || exit 1'''.format(job_name=job_name,
+if [ $# -eq 0 ]; then
+    python {training_script} {config_counter} || exit 1
+fi
+python {testing_script} {config_counter} || exit 1'''.format(job_name=job_name,
                                                                            output_file=output_file,
                                                                            error_file=error_file,
-                                                                           python_script=python_script,
-                                                                           config_counter=config_counter,
-                                                                           new_p_phys_directory=new_p_phys_directory))
+                                                                           training_script=training_script,
+                                                                           config_counter=config_counter))
                                             f.close()
                                             
                                             # Finally I copy the base neural network that will be loaded into that folder

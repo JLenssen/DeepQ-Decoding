@@ -1,24 +1,26 @@
 {
-  "config_dir" : "d7_tensorboard_test",
+  "config_dir" : "d7_dp_exploration_v4",
   "fixed_config": {
     "d": 7,
     "use_Y": false,
     "train_freq": 1,
     "batch_size": 32,
     "print_freq": 250,
+    "save_weight_freq": 100000,
     "rolling_average_length": 1000,
-    "stopping_patience": 1000,
+    "stopping_patience": 10000,
     "error_model": "DP",
-    "c_layers": [[64,3,2],[32,2,1],[32,2,1]],
+    "c_layers": [[128,3,2],[64,2,1],[32,2,1]],
     "ff_layers": [[512,0.2]],
-    "max_timesteps": 1000000,
+    "max_timesteps": 3000000,
     "volume_depth": 7,
-    "testing_length": 101,
-    "buffer_size": 50000,
+    "testing_length": 501,
+    "buffer_size": 100000,
     "dueling": true,
     "masked_greedy": false,
     "static_decoder": false,
-    "use_tensorboard" : true
+    "use_tensorboard" : false,
+    "random_seed": 0
   },
   "base_param_grid": {
     "p_phys": 0.001,
@@ -26,8 +28,8 @@
     "learning_starts_list": [1000],
     "learning_rate_list": [0.0001, 0.00005, 0.00001],
     "target_network_update_freq_list": [2500, 5000],
-    "gamma_list": [0.99],
-    "exploration_fraction_list": [100000, 200000],
+    "gamma_list": [0.95],
+    "exploration_fraction_list": [400000, 500000],
     "max_eps_list": [1.0],
     "final_eps_list": [0.04, 0.02, 0.001],
     "sim_time_per_ef": [14, 14]
@@ -42,11 +44,11 @@
     "controller_param_grid": {           
       "learning_starts_list": [1000],
       "learning_rate_list": [0.0001, 0.00005, 0.00001, 0.000005],
-      "exploration_fraction_list": [100000, 200000],
+      "exploration_fraction_list": [400000, 500000],
       "final_eps_list": [0.04, 0.02, 0.001],
       "max_eps_list": [1.0, 0.5, 0.25],
       "target_network_update_freq_list": [2500, 5000],
-      "gamma_list": [0.99]
+      "gamma_list": [0.95]
     },
     "controller_param_grid_desc": "Grid over which any spawned simulation will run"
   }

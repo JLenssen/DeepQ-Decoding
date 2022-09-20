@@ -53,19 +53,20 @@ for ls in parameter_grid["learning_starts_list"]:
                             job_name=data["training_id"]+"_"+str(parameter_grid["p_phys"])+"_"+str(config_counter)
                             output_file = os.path.join(cwd,"output_files/out_"+job_name+".out")
                             error_file = os.path.join(cwd,"output_files/err_"+job_name+".err")
-                            python_script = os.path.join(cwd, "Single_Point_Training_Script.py")
+                            training_script = os.path.join(cwd, "Single_Point_Training_Script.py")
+                            testing_script = os.path.join(cwd, "Single_Point_Testing_Script.py")
 
 
                             f = open(config_directory + "/simulation_script.sh",'w')  
                             f.write('''#!/bin/bash
 
-#SBATCH --job-name='''+job_name+'''          # Job name, will show up in squeue output
-#SBATCH --ntasks=4                           # Number of cores
-#SBATCH --nodes=1                            # Ensure that all cores are on one machine
-#SBATCH --time=0-'''+job_limit+''':30:00    # Runtime in DAYS-HH:MM:SS format
-#SBATCH --mem-per-cpu=1000                   # Memory per cpu in MB (see also --mem) 
-#SBATCH --output='''+output_file+'''         # File to which standard out will be written
-#SBATCH --error='''+error_file+'''           # File to which standard err will be written
+#SBATCH --job-name={job_name}          # Job name, will show up in squeue output
+#SBATCH --ntasks=4                     # Number of cores
+#SBATCH --nodes=1                      # Ensure that all cores are on one machine
+#SBATCH --time=0-{job_limit}:30:00     # Runtime in DAYS-HH:MM:SS format
+#SBATCH --mem-per-cpu=1000             # Memory per cpu in MB (see also --mem) 
+#SBATCH --output={output_file}         # File to which standard out will be written
+#SBATCH --error={error_file}           # File to which standard err will be written
 
 # store job info in output file, if you want...
 scontrol show job $SLURM_JOBID
@@ -81,12 +82,19 @@ source activate deepq-mkl
 # ----------- Tensorflow XLA flag -----------------------------------------------
 export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 
-# ------- run the script -----------------------
-
-python -u '''+python_script+''' '''+str(config_counter)+''' || exit 1
+# ------- run the script if argument given, we only test the agent --------------
+if [ $# -eq 0 ]; then
+    python -u {training_script} {config_counter} || exit 1
+fi
+python -u {testing_script} {config_counter} || exit 1
 
 #----------- wait some time ------------------------------------
 
-sleep 50''')
+sleep 50'''.format(job_name=job_name,
+                output_file=output_file,
+                error_file=error_file,
+                training_script=training_script,
+                testing_script=testing_script,
+                config_counter=config_counter))
                             f.close()
                             config_counter += 1 

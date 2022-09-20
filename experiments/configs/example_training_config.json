@@ -6,6 +6,7 @@
     "train_freq": 1,
     "batch_size": 32,
     "print_freq": 250,
+    "save_weight_freq": 100000,
     "rolling_average_length": 1000,
     "stopping_patience": 1000,
     "error_model": "DP",
