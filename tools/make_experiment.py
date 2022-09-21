@@ -43,7 +43,6 @@ with open(f"{rootdir}/current_error_rate.txt", "w") as f:
   f.write(f"{current_error_rate}\n")
 
 shutil.copyfile(f"{scripts_dir}/Controller.py", f"{rootdir}/Controller.py")
-shutil.copyfile(f"{scripts_dir}/make_executable.sh", f"{rootdir}/make_executable.sh")
 
 for phy in config["controller_params"]["p_phys_list"]:
   os.mkdir(f"{rootdir}/{phy}")
@@ -59,7 +58,7 @@ for phy in config["controller_params"]["p_phys_list"]:
 
 # 4. Move to new working environment
 os.chdir(rootdir)
-# Make script executable
-subprocess.run(["bash", "make_executable.sh"])
 # Generate configs for first error rate
 subprocess.run(["python3", "Generate_Base_Configs_and_Simulation_Scripts.py"])
+# Make Start_Simulations.sh executable (0o is octinteger literal)
+os.chmod("Start_Simulations.sh", 0o744)

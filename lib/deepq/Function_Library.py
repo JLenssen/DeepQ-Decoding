@@ -67,8 +67,7 @@ def multiplyPaulis(a,b):
     :param: b: an int in [0,1,2,3] representing [I,X,Y,Z]
     """
     
-    out = [[0,1,2,3],[1,0,3,2],[2,3,0,1],[3,2,1,0]]
-    return out[int(a)][int(b)]
+    return a^b
 
 def generate_surface_code_syndrome_NoFT_efficient(error,qubits):
     """"
@@ -155,11 +154,7 @@ def obtain_new_error_configuration(old_configuration,new_gates):
     """
     
     new_configuration = np.zeros(np.shape(old_configuration))
-    for row in range(new_configuration.shape[0]):
-        for col in range(new_configuration.shape[1]):
-            new_configuration[row,col] = multiplyPaulis(new_gates[row,col], old_configuration[row,col])
-            
-    return new_configuration
+    return new_configuration^new_gates
 
 def index_to_move(d,move_index,error_model,use_Y=True):
     """"

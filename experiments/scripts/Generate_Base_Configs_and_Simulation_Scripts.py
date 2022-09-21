@@ -67,7 +67,7 @@ for ls in parameter_grid["learning_starts_list"]:
 #SBATCH --job-name={job_name}          # Job name, will show up in squeue output
 #SBATCH --ntasks=4                     # Number of cores
 #SBATCH --nodes=1                      # Ensure that all cores are on one machine
-#SBATCH --time=0-{job_limit}:01:00      # Runtime in DAYS-HH:MM:SS format # TODO fix me
+#SBATCH --time=0-{job_limit}:30:00      # Runtime in DAYS-HH:MM:SS format # TODO fix me
 #SBATCH --mem-per-cpu=1000             # Memory per cpu in MB (see also --mem) 
 #SBATCH --output={output_file}         # File to which standard out will be written
 #SBATCH --error={error_file}           # File to which standard err will be written
