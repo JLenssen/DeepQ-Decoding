@@ -247,6 +247,8 @@ if completed_simulations == num_configs:
 
                                             # Now, write into the bash script exactly what we want to appear there
                                             job_name=data["training_id"]+"_"+str(new_p_phys)+"_"+str(config_counter)
+                                            job_cores=data["fixed_config"]["job_cores"]
+                                            job_memory_per_cpu=data["fixed_config"]["job_memory_per_cpu"]
                                             output_file = os.path.join(new_p_phys_directory,"output_files/out_"+job_name+".out")
                                             error_file = os.path.join(new_p_phys_directory,"output_files/err_"+job_name+".err")
                                             training_script = os.path.join(new_p_phys_directory,"Single_Point_Continue_Training_Script.py")
@@ -256,10 +258,10 @@ if completed_simulations == num_configs:
                                             f.write('''#!/bin/bash
 
 #SBATCH --job-name={job_name}                # Job name, will show up in squeue output
-#SBATCH --ntasks=4                           # Number of cores
+#SBATCH --ntasks={job_cores}                 # Number of cores
 #SBATCH --nodes=1                            # Ensure that all cores are on one machine
 #SBATCH --time=0-15:30:00                    # Runtime in DAYS-HH:MM:SS format
-#SBATCH --mem-per-cpu=1000                   # Memory per cpu in MB (see also --mem) 
+#SBATCH --mem-per-cpu={job_memory_per_cpu}   # Memory per cpu in MB (see also --mem) 
 #SBATCH --output={output_file}               # File to which standard out will be written
 #SBATCH --error={error_file}                 # File to which standard err will be written
 
@@ -284,6 +286,8 @@ if [ $# -eq 0 ]; then
 fi
 python {testing_script} {config_counter} {configs_path} || exit 1'''.format(job_name=job_name,
                                                                            output_file=output_file,
+                                                                           job_cores=job_cores,
+                                                                           job_memory_per_cpu=job_memory_per_cpu,
                                                                            error_file=error_file,
                                                                            training_script=training_script,
                                                                            testing_script=testing_script,

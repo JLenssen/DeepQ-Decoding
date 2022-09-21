@@ -80,7 +80,7 @@ def generate_surface_code_syndrome_NoFT_efficient(error,qubits):
     """
     
     d = np.shape(error)[0]
-    syndrome = np.zeros((d+1,d+1),int)
+    syndrome = np.zeros((d+1,d+1), np.uint8)
 
     for i in range(d): 
         for j in range(d):
@@ -103,7 +103,7 @@ def generate_faulty_syndrome(true_syndrome, p_measurement_error):
     :return: faulty_syndrome: The faulty syndrome
     """
     
-    faulty_syndrome = np.zeros(np.shape(true_syndrome),int)
+    faulty_syndrome = np.zeros(np.shape(true_syndrome), np.uint8)
 
     # First we take care of the "bulk stabilizers"
     for row in range(1, true_syndrome.shape[0]-1):
@@ -152,9 +152,9 @@ def obtain_new_error_configuration(old_configuration,new_gates):
     :param: new_gates: An error configuration on a square lattice
     :return: new_configuration: The resulting error configuration
     """
-    
-    new_configuration = np.zeros(np.shape(old_configuration))
-    return new_configuration^new_gates
+
+    return np.bitwise_xor(new_gates, old_configuration)
+
 
 def index_to_move(d,move_index,error_model,use_Y=True):
     """"
@@ -168,7 +168,7 @@ def index_to_move(d,move_index,error_model,use_Y=True):
     :return: new_move: A lattice representation of the desired move.
     """
 
-    new_move = np.zeros((d,d))
+    new_move = np.zeros((d,d), np.uint8)
     
     if error_model == "X":
         if move_index < (d**2):

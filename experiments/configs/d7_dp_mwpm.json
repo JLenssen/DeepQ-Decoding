@@ -5,7 +5,7 @@
     "use_Y": false,
     "train_freq": 1,
     "batch_size": 32,
-    "print_freq": 250,
+    "print_freq": 500,
     "save_weight_freq": 150000,
     "rolling_average_length": 1000,
     "stopping_patience": 10000,
@@ -20,7 +20,9 @@
     "masked_greedy": false,
     "static_decoder": false,
     "use_tensorboard" : false,
-    "random_seed": 0
+    "random_seed": 0,
+    "job_cores": 1,
+    "job_memory_per_cpu": 1000
   },
   "base_param_grid": {
     "p_phys": 0.001,
@@ -28,8 +30,8 @@
     "learning_starts_list": [1000],
     "learning_rate_list": [0.0001, 0.00005, 0.00001],
     "target_network_update_freq_list": [2500, 5000],
-    "gamma_list": [0.95],
-    "exploration_fraction_list": [400000, 500000],
+    "gamma_list": [0.95, 0.9],
+    "exploration_fraction_list": [500000],
     "max_eps_list": [1.0],
     "final_eps_list": [0.04, 0.02, 0.001],
     "sim_time_per_ef": [14, 14]
@@ -44,11 +46,11 @@
     "controller_param_grid": {           
       "learning_starts_list": [1000],
       "learning_rate_list": [0.0001, 0.00005, 0.00001, 0.000005],
-      "exploration_fraction_list": [400000, 500000],
+      "exploration_fraction_list": [500000],
       "final_eps_list": [0.04, 0.02, 0.001],
       "max_eps_list": [1.0, 0.5, 0.25],
       "target_network_update_freq_list": [2500, 5000],
-      "gamma_list": [0.95]
+      "gamma_list": [0.95, 0.9]
     },
     "controller_param_grid_desc": "Grid over which any spawned simulation will run"
   }

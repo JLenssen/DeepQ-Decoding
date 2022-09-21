@@ -75,7 +75,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         self.syndromes, self.inv_syndromes = self.get_syndrome_information(self.qubits)
         self.qubit_stabilizers = self.get_stabilizer_list(self.qubits, self.d)  
         self.qubit_neighbours = self.get_qubit_neighbour_list(self.d) 
-        self.completed_actions = np.zeros(self.num_actions, int)
+        self.completed_actions = np.zeros(self.num_actions, np.uint16)
         
     
         self.observation_space=gym.spaces.Box(low=0,high=1,
@@ -86,12 +86,12 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         
         self.action_space = gym.spaces.Discrete(self.num_actions)
 
-        self.hidden_state = np.zeros((self.d, self.d), int)
-        self.current_true_syndrome = np.zeros((self.d+1, self.d+1), int)
+        self.hidden_state = np.zeros((self.d, self.d), np.uint8)
+        self.current_true_syndrome = np.zeros((self.d+1, self.d+1), np.uint8)
         self.summed_syndrome_volume = None         
-        self.board_state = np.zeros((self.volume_depth + self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1),int)
+        self.board_state = np.zeros((self.volume_depth + self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1), np.uint8)
 
-        self.completed_actions = np.zeros(self.num_actions, int)
+        self.completed_actions = np.zeros(self.num_actions, np.uint8)
         self.acted_on_qubits = set()
         self.legal_actions = set()
         self.done = False
@@ -155,7 +155,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
 
             trivial_volume = True
             while trivial_volume: 
-                self.summed_syndrome_volume = np.zeros((self.d + 1, self.d + 1), int)
+                self.summed_syndrome_volume = np.zeros((self.d + 1, self.d + 1), np.uint8)
                 faulty_syndromes = []
                 for j in range(self.volume_depth):
                     error = self.noise_model.generate_error()
@@ -178,7 +178,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
             self.reset_legal_moves()
 
             # update the part of the state which shows the actions you have just taken
-            self.board_state[self.volume_depth:,:,:] = np.zeros((self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1),int)
+            self.board_state[self.volume_depth:,:,:] = np.zeros((self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1), np.uint8)
 
 
         else:
@@ -240,13 +240,13 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         """
 
         self.done = False
-        self.hidden_state = np.zeros((self.d, self.d), int)
-        self.current_true_syndrome = np.zeros((self.d+1, self.d+1), int) 
-        self.board_state = np.zeros((self.volume_depth + self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1),int)
+        self.hidden_state = np.zeros((self.d, self.d), np.uint8)
+        self.current_true_syndrome = np.zeros((self.d+1, self.d+1), np.uint8) 
+        self.board_state = np.zeros((self.volume_depth + self.n_action_layers, 2 * self.d + 1, 2 * self.d + 1), np.uint8)
         
         trivial_volume = True
         while trivial_volume:
-            self.summed_syndrome_volume = np.zeros((self.d + 1, self.d + 1), int)
+            self.summed_syndrome_volume = np.zeros((self.d + 1, self.d + 1), np.uint8)
             faulty_syndromes = []
             for j in range(self.volume_depth):
                 error = self.noise_model.generate_error()
@@ -270,7 +270,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         Reset the legal moves
         """
 
-        self.completed_actions = np.zeros(self.num_actions, int)
+        self.completed_actions = np.zeros(self.num_actions, np.uint8)
         self.acted_on_qubits = set()
         self.legal_actions = set()
 
@@ -303,7 +303,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         Pad a syndrome into the required embedding
         """
 
-        syndrome_out = np.zeros((2*self.d+1, 2*self.d+1),int)
+        syndrome_out = np.zeros((2*self.d+1, 2*self.d+1), np.uint8)
         
         for x in range( 2*self.d+1 ):
             for y in range( 2*self.d+1 ):
@@ -330,7 +330,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         """
         Pad an action history for a single type of Pauli flip into the required embedding.
         """
-        actions_out = np.zeros( ( 2*self.d+1, 2*self.d+1 ),int )
+        actions_out = np.zeros( ( 2*self.d+1, 2*self.d+1 ), np.uint8)
 
         for action_index, action_taken in enumerate( actions_in ):
             if action_taken:
@@ -426,7 +426,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
         syndromes: List of syndromes [x,y,pauli,index]
         inv_syndromes: Invert mapping []
         """
-        syndromes = np.zeros((self.d+1, self.d+1, 2), int)
+        syndromes = np.zeros((self.d+1, self.d+1, 2), np.uint8)
         inv_syndromes = {1: {}, 3: {}}
 
         for i in range(self.d):

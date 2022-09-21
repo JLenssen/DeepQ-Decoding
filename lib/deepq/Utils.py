@@ -38,8 +38,8 @@ class MatchingDecoder():
     num_qubits = H.shape[1] # columns correspond to data qubits
     singletons = len(np.where(np.sum(H, axis=0) == 1)[0]) # num data qubits supported by only one stabilizer
     boundary_indices = [e + num_syndromes for e in range(singletons)] # indices for boundary nodes
-    weights = np.ones(num_qubits+1) # Manhattan distance
-    error_probabilities = np.ones(num_qubits+1) # Equi-probable errors
+    weights = np.ones(num_qubits+1, dtype=np.uint8) # Manhattan distance
+    error_probabilities = np.ones(num_qubits+1, dtype=np.uint8) # Equi-probable errors
 
     # csr matrix explained: https://stackoverflow.com/questions/52299420/scipy-csr-matrix-understand-indptr
     # note: matrix below is CSC!
@@ -72,7 +72,8 @@ class MatchingDecoder():
     corrections = []
     for idx, syn in enumerate(syndromes):
       # set num_neighbours to None to ensure exact matching in PyMatching
-      corrections.append(self.M[idx].decode(syn, num_neighbours=None))
+      correction = self.M[idx].decode(syn, num_neighbours=None).astype(dtype=np.uint8)
+      corrections.append(correction)
     return corrections
 
 def get_parity_matrix(stab_list, syndromes, pauli: int, d: int) -> np.array:
@@ -85,7 +86,7 @@ def get_parity_matrix(stab_list, syndromes, pauli: int, d: int) -> np.array:
   :param: d: surface code distance
   """
   num_pauli_stabs = (d**2-1)//2
-  H = np.zeros((num_pauli_stabs, d**2),int)
+  H = np.zeros((num_pauli_stabs, d**2), dtype=np.uint8)
   for idx, qubit_stab_list in enumerate(stab_list):
     for stab in qubit_stab_list:
       if syndromes[stab[0], stab[1], 0] == pauli:
