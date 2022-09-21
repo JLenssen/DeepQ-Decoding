@@ -5,6 +5,7 @@
 # ----- (0) Imports --------------------------------------------------------------------------------------
 
 import numpy as np
+import pickle
 
 from keras.models import Sequential
 from keras.optimizers import Adam
@@ -13,6 +14,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, Flatten, A
 from rl.agents.dqn import DQNAgent
 from rl.policy import GreedyQPolicy
 from rl.memory import SequentialMemory
+from rl.callbacks import Callback
 
 # ---- (1) Functions -------------------------------------------------------------------------------------
 
@@ -321,3 +323,27 @@ def build_eval_agent_model(all_configs: dict, env):
     dqn.compile(Adam(lr=all_configs["learning_rate"]))
     dqn.model.load_weights(all_configs["model_weights_path"])
     return dqn
+
+
+class CustomizedModelIntervalCheckpoint(Callback):
+    def __init__(self, filepath, memorypath, interval, verbose=0):
+        super(CustomizedModelIntervalCheckpoint, self).__init__()
+        self.filepath = filepath
+        self.memorypath = memorypath
+        self.interval = interval
+        self.verbose = verbose
+        self.total_steps = 0
+
+    def on_step_end(self, step, logs={}):
+        """ Save weights at interval steps during training """
+        self.total_steps += 1
+        if self.total_steps % self.interval != 0:
+            # Nothing to do.
+            return
+
+        filepath = self.filepath.format(step=self.total_steps, **logs)
+        if self.verbose > 0:
+            print('Step {}: saving model to {}'.format(self.total_steps, filepath))
+        self.model.save_weights(filepath, overwrite=True)
+        # save model memory
+        pickle.dump(self.model.memory, open(self.memorypath, "wb"))

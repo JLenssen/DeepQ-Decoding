@@ -95,9 +95,11 @@ for config in configs:
             sim_start_time = pickle.load(open(folder+"started_at.p", "rb" ))
             time_diff = now - sim_start_time
             time_diff_hours = time_diff.total_seconds()/(3600.0)
+            # the training timed out without any tests being run. Lets start testing script to be sure to not miss any good agents
             if time_diff_hours > controller_params["simulation_time_limit_hours"]:
-                results_dict[str(config)] = 0
-                completed_simulations +=1
+                sim_script = os.path.join(folder, "simulation_script.sh")
+                subprocess.call(["sbatch", sim_script, "1"])
+                results_dict[str(config)] = "still testing"
             else:
                 results_dict[str(config)] = "still running"
         else:
@@ -200,7 +202,7 @@ if completed_simulations == num_configs:
 
 
             new_p_phys = controller_params["p_phys_list"][new_p_phys_index]
-            new_p_phys_directory = os.path.join(cwd,str(new_p_phys)+"/")
+            new_p_phys_directory = os.path.join(cwd, str(new_p_phys))
 
             text_file = open(history_path, "a")
             text_file.write("Spawning new simulations from "+str(top_counter)+" simulations which surpassed the threshold.\n\n")
@@ -278,14 +280,15 @@ export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 
 # ------- run the script -----------------------
 if [ $# -eq 0 ]; then
-    python {training_script} {config_counter} || exit 1
+    python {training_script} {config_counter} {configs_path} || exit 1
 fi
-python {testing_script} {config_counter} || exit 1'''.format(job_name=job_name,
+python {testing_script} {config_counter} {configs_path} || exit 1'''.format(job_name=job_name,
                                                                            output_file=output_file,
                                                                            error_file=error_file,
                                                                            training_script=training_script,
                                                                            testing_script=testing_script,
-                                                                           config_counter=config_counter))
+                                                                           config_counter=config_counter,
+                                                                           configs_path=new_p_phys_directory))
                                             f.close()
                                             
                                             # Finally I copy the base neural network that will be loaded into that folder
@@ -293,15 +296,15 @@ python {testing_script} {config_counter} || exit 1'''.format(job_name=job_name,
                                             destination_weights = os.path.join(config_directory,"initial_dqn_weights.h5f")
                                             copyfile(source_weights, destination_weights)
 
-                                            source_memory = os.path.join(check_directory,"config_"+spawn+"/memory.p")
+                                            source_memory = os.path.join(check_directory,"config_"+spawn+"/final_memory.p")
                                             destination_memory = os.path.join(config_directory,"memory.p")
                                             copyfile(source_memory, destination_memory)
 
                                             config_counter += 1 
                                         
             # Now, I want to run all the simulation scripts that I have just generated...
-            path_to_sims_script = os.path.join(new_p_phys_directory, "Start_Continuing_Simulations.sh")
-            subprocess.call([path_to_sims_script, new_p_phys_directory])                                   # NB! This has to be executable!!
+            path_to_sims_script = os.path.join(cwd, "Start_Simulations.sh")
+            subprocess.call([path_to_sims_script, str(new_p_phys)])                                   # NB! This has to be executable!!
 
             # Now clean configs
             clean_config_dir(current_error_rate, 5)

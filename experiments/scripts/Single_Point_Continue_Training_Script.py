@@ -5,7 +5,7 @@ from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import EpsGreedyQPolicy, LinearAnnealedPolicy, GreedyQPolicy
-from rl.callbacks import FileLogger, ModelIntervalCheckpoint
+from rl.callbacks import FileLogger
 
 from deepq.Function_Library import *
 from deepq.Environments import *
@@ -25,10 +25,10 @@ variable_config_number = sys.argv[1]
 base_directory = sys.argv[2]
 
 variable_configs_folder = os.path.join(
-    base_directory, "./config_"+str(variable_config_number) + "/")
+    base_directory, "config_"+str(variable_config_number) + "/")
 variable_configs_path = os.path.join(
     variable_configs_folder, "variable_config_"+variable_config_number + ".p")
-fixed_configs_path = os.path.join(base_directory, "../fixed_config.p")
+fixed_configs_path = os.path.join(os.path.dirname(base_directory), "fixed_config.p")
 
 fixed_configs = pickle.load(open(fixed_configs_path, "rb"))
 variable_configs = pickle.load(open(variable_configs_path, "rb"))
@@ -43,7 +43,7 @@ for key in variable_configs.keys():
 
 if fixed_configs["static_decoder"]:
   static_decoder = load_model(os.path.join(
-      base_directory, "../static_decoder"))
+      base_directory, "static_decoder"))
 else:
   static_decoder = None
 
@@ -106,9 +106,10 @@ dqn.model.load_weights(initial_weights_file)
 logging_path = os.path.join(variable_configs_folder, "training_history.json")
 logging_callback = FileLogger(
     filepath=logging_path, interval=all_configs["print_freq"])
-final_weights_path = os.path.join(
+weights_path = os.path.join(
     variable_configs_folder, "final_dqn_weights.h5f")
-model_callback = ModelIntervalCheckpoint(filepath=final_weights_path,
+memory_file = os.path.join(variable_configs_folder, "final_memory.p")
+model_callback = CustomizedModelIntervalCheckpoint(filepath=weights_path, memorypath=memory_file,
                                          interval=all_configs["save_weight_freq"]
                                          )
 
@@ -137,5 +138,4 @@ history = dqn.fit(env,
 # --------------------------------------------------------------------------------------------
 
 pickle.dump(dqn.memory, open(memory_file, "wb"))
-
-dqn.save_weights(final_weights_path, overwrite=True)
+dqn.save_weights(weights_path, overwrite=True)

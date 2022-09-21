@@ -8,13 +8,17 @@ cwd = os.getcwd()
 
 # ------------ the fixed parameters: These are constant for all error rates -----------------------------
 
-with open('../training_config.json', 'r') as f:
+with open('training_config.json', 'r') as f:
     data = json.load(f)
     fixed_config = data["fixed_config"]
     parameter_grid = data["base_param_grid"]
 
-fixed_config_path = os.path.join(cwd, "../fixed_config.p")
+fixed_config_path = os.path.join(cwd, "fixed_config.p")
 pickle.dump(fixed_config, open(fixed_config_path, "wb" ) )
+
+# Get initial error rate for which we generate initial configurations
+initial_error_rate = str(parameter_grid["p_phys"])
+configs_path = os.path.join(cwd, initial_error_rate)
 
 # ---------- Generate training scripts based on parameter grid ----------------------------------------------------
 
@@ -38,7 +42,7 @@ for ls in parameter_grid["learning_starts_list"]:
                             "gamma": g,
                             "final_eps": fe}
 
-                            config_directory = os.path.join(cwd,"config_"+str(config_counter)+"/")
+                            config_directory = os.path.join(configs_path, "config_"+str(config_counter)+"/")
                             if not os.path.exists(config_directory):
                                 os.makedirs(config_directory)
                             else:
@@ -51,10 +55,10 @@ for ls in parameter_grid["learning_starts_list"]:
                             # Now, write into the bash script exactly what we want to appear there
                             job_limit = str(parameter_grid["sim_time_per_ef"][ef_count])
                             job_name=data["training_id"]+"_"+str(parameter_grid["p_phys"])+"_"+str(config_counter)
-                            output_file = os.path.join(cwd,"output_files/out_"+job_name+".out")
-                            error_file = os.path.join(cwd,"output_files/err_"+job_name+".err")
-                            training_script = os.path.join(cwd, "Single_Point_Training_Script.py")
-                            testing_script = os.path.join(cwd, "Single_Point_Testing_Script.py")
+                            output_file = os.path.join(configs_path,"output_files/out_"+job_name+".out")
+                            error_file = os.path.join(configs_path,"output_files/err_"+job_name+".err")
+                            training_script = os.path.join(configs_path, "Single_Point_Training_Script.py")
+                            testing_script = os.path.join(configs_path, "Single_Point_Testing_Script.py")
 
 
                             f = open(config_directory + "/simulation_script.sh",'w')  
@@ -63,7 +67,7 @@ for ls in parameter_grid["learning_starts_list"]:
 #SBATCH --job-name={job_name}          # Job name, will show up in squeue output
 #SBATCH --ntasks=4                     # Number of cores
 #SBATCH --nodes=1                      # Ensure that all cores are on one machine
-#SBATCH --time=0-{job_limit}:30:00     # Runtime in DAYS-HH:MM:SS format
+#SBATCH --time=0-{job_limit}:01:00      # Runtime in DAYS-HH:MM:SS format # TODO fix me
 #SBATCH --mem-per-cpu=1000             # Memory per cpu in MB (see also --mem) 
 #SBATCH --output={output_file}         # File to which standard out will be written
 #SBATCH --error={error_file}           # File to which standard err will be written
@@ -84,9 +88,9 @@ export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 
 # ------- run the script if argument given, we only test the agent --------------
 if [ $# -eq 0 ]; then
-    python -u {training_script} {config_counter} || exit 1
+    python -u {training_script} {config_counter} {configs_path} || exit 1
 fi
-python -u {testing_script} {config_counter} || exit 1
+python -u {testing_script} {config_counter} {configs_path} || exit 1
 
 #----------- wait some time ------------------------------------
 
@@ -96,6 +100,7 @@ sleep 50'''.format(job_name=job_name,
                 job_limit=job_limit,
                 training_script=training_script,
                 testing_script=testing_script,
-                config_counter=config_counter))
+                config_counter=config_counter,
+                configs_path=configs_path))
                             f.close()
                             config_counter += 1 
