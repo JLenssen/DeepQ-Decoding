@@ -3,6 +3,7 @@
 from keras.models import load_model
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard
+from keras import backend as K
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import EpsGreedyQPolicy, LinearAnnealedPolicy, GreedyQPolicy
@@ -56,6 +57,16 @@ os.environ['PYTHONHASHSEED'] = str(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
 tf.set_random_seed(RANDOM_SEED)
+
+NUM_PARALLEL_EXEC_UNITS=1
+config = tf.ConfigProto(intra_op_parallelism_threads=NUM_PARALLEL_EXEC_UNITS, inter_op_parallelism_threads=0, allow_soft_placement=True, device_count = {'CPU': NUM_PARALLEL_EXEC_UNITS })
+session = tf.Session(config=config)
+K.set_session(session)
+
+os.environ["OMP_NUM_THREADS"] = str(NUM_PARALLEL_EXEC_UNITS)
+os.environ["KMP_BLOCKTIME"] = "0"
+os.environ["KMP_SETTINGS"] = "1"
+os.environ["KMP_AFFINITY"]= "granularity=fine,verbose,compact,1,0"
 
 # --------------------------------------------------------------------------------------------
 
@@ -116,6 +127,10 @@ memory_file = os.path.join(variable_configs_folder, "final_memory.p")
 callbacks.append(CustomizedModelIntervalCheckpoint(filepath=weights_path, memorypath=memory_file,
                                          interval=all_configs["save_weight_freq"]
                                          ))
+
+# -------------------------------------------------------------------------------------------
+
+
 
 # -------------------------------------------------------------------------------------------
 

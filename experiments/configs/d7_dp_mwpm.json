@@ -22,7 +22,7 @@
     "use_tensorboard" : false,
     "random_seed": 0,
     "job_cores": 1,
-    "job_memory_per_cpu": 1000
+    "job_memory_per_cpu": 5500
   },
   "base_param_grid": {
     "p_phys": 0.001,
