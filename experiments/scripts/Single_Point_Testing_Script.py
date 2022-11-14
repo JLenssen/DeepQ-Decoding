@@ -111,8 +111,16 @@ count = 0
 while keep_evaluating:
 
   err_rate = error_rates[count]
-  env.p_phys = err_rate
-  env.p_meas = err_rate
+
+  print(f"Evaluating error rate: {err_rate}")
+  noise_model = NoiseFactory(
+    all_configs["error_model"], all_configs["d"], err_rate).generate()
+  env = Surface_Code_Environment_Multi_Decoding_Cycles(d=all_configs["d"],
+                                                      p_meas=err_rate,
+                                                      noise_model=noise_model,
+                                                      use_Y=all_configs["use_Y"],
+                                                      volume_depth=all_configs["volume_depth"],
+                                                      static_decoder=static_decoder)
 
   dict_key = str(err_rate)[:5]
 
@@ -125,10 +133,11 @@ while keep_evaluating:
   if abs(trained_at - err_rate) < 1e-6:
     results_file = os.path.join(variable_configs_folder, "results.p")
     pickle.dump(results, open(results_file, "wb"))
-
-  to_beat = thresholds[count]
-  if final_result < to_beat or count == (num_to_test - 1):
     keep_evaluating = False
+
+  # to_beat = thresholds[count]
+  # if final_result < to_beat or count == (num_to_test - 1):
+  #   keep_evaluating = False
 
   count += 1
 

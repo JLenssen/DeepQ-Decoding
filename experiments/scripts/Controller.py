@@ -80,30 +80,31 @@ results_dict = {}
 for config in configs:
     folder = os.path.join(check_directory,"config_"+str(config)+"/")
     available_files = os.listdir(folder)
-    if 'results.p' in available_files:
-        # If the results file is available then we add the result, and mark the simulation as being completed
-        results = pickle.load(open(folder+"results.p", "rb" ))
-        results_dict[str(config)] = results[-1:][0]
-        completed_simulations +=1
-    else:
-        # If testing didn't pass current error rate, the training will get stuck. Therefore we check if 'all_results.p' is available.
-        if "all_results.p" in available_files:
+    if 'all_results.p' in available_files:
+        # Testing completed, lets check if testing passed current error rate
+        if 'results.p' in available_files:
+            # If the results file is available then we add the result, and mark the simulation as being completed
+            results = pickle.load(open(folder+"results.p", "rb" ))
+            results_dict[str(config)] = results[-1:][0]
+            completed_simulations +=1
+        else:
+            # If testing didn't pass current error rate we set average qubit lifetime as zero and mark training as completed
             results_dict[str(config)] = 0
             completed_simulations +=1
-        elif "started_at.p" in available_files:
-            # if we know that the simulation started, then we see how long it has been running for
-            sim_start_time = pickle.load(open(folder+"started_at.p", "rb" ))
-            time_diff = now - sim_start_time
-            time_diff_hours = time_diff.total_seconds()/(3600.0)
-            # the training timed out without any tests being run. Lets start testing script to be sure to not miss any good agents
-            if time_diff_hours > controller_params["simulation_time_limit_hours"]:
-                sim_script = os.path.join(folder, "simulation_script.sh")
-                subprocess.call(["sbatch", sim_script, "1"])
-                results_dict[str(config)] = "still testing"
-            else:
-                results_dict[str(config)] = "still running"
+    elif "started_at.p" in available_files:
+        # if we know that the simulation started, then we see how long it has been running for
+        sim_start_time = pickle.load(open(folder+"started_at.p", "rb" ))
+        time_diff = now - sim_start_time
+        time_diff_hours = time_diff.total_seconds()/(3600.0)
+        # the training timed out without any tests being run. Lets start testing script to be sure to not miss any good agents
+        if time_diff_hours > controller_params["simulation_time_limit_hours"]:
+            sim_script = os.path.join(folder, "simulation_script.sh")
+            subprocess.call(["sbatch", sim_script, "1"])
+            results_dict[str(config)] = "still testing"
         else:
-            results_dict[str(config)] = "not started"
+            results_dict[str(config)] = "still running"
+    else:
+        results_dict[str(config)] = "not started"
 
 # ---- Here we write out the results to keep track of what is going on ----------------------------------------------------------------
 
@@ -284,7 +285,7 @@ export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 if [ $# -eq 0 ]; then
     python {training_script} {config_counter} {configs_path} || exit 1
 fi
-python {testing_script} {config_counter} {configs_path} || exit 1'''.format(job_name=job_name,
+python {testing_script} {config_counter} {configs_path} > {error_file}_test || exit 1'''.format(job_name=job_name,
                                                                            output_file=output_file,
                                                                            job_cores=job_cores,
                                                                            job_memory_per_cpu=job_memory_per_cpu,

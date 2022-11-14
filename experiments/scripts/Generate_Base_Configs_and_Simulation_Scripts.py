@@ -92,7 +92,7 @@ export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 if [ $# -eq 0 ]; then
     python -u {training_script} {config_counter} {configs_path} || exit 1
 fi
-python -u {testing_script} {config_counter} {configs_path} || exit 1
+python -u {testing_script} {config_counter} {configs_path} > {error_file}_test || exit 1
 
 #----------- wait some time ------------------------------------
 

@@ -31,10 +31,10 @@
     "learning_rate_list": [0.0001, 0.00005, 0.00001],
     "target_network_update_freq_list": [2500, 5000],
     "gamma_list": [0.95, 0.9],
-    "exploration_fraction_list": [500000],
+    "exploration_fraction_list": [750000],
     "max_eps_list": [1.0],
     "final_eps_list": [0.04, 0.02, 0.001],
-    "sim_time_per_ef": [14, 14]
+    "sim_time_per_ef": [14]
   },
   "controller_params": {
     "threshold_dict": {"0.001": 1000, "0.003": 334, "0.005": 200, "0.007": 142, "0.009": 112, "0.011": 91, "0.013": 77, "0.015": 67, "0.017": 59},
@@ -46,7 +46,7 @@
     "controller_param_grid": {           
       "learning_starts_list": [1000],
       "learning_rate_list": [0.0001, 0.00005, 0.00001, 0.000005],
-      "exploration_fraction_list": [500000],
+      "exploration_fraction_list": [750000],
       "final_eps_list": [0.04, 0.02, 0.001],
       "max_eps_list": [1.0, 0.5, 0.25],
       "target_network_update_freq_list": [2500, 5000],
