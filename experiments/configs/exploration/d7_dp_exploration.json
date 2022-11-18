@@ -1,0 +1,57 @@
+{
+  "config_dir" : "d7_dp_exploration",
+  "fixed_config": {
+    "d": 7,
+    "use_Y": false,
+    "train_freq": 1,
+    "batch_size": 32,
+    "print_freq": 500,
+    "save_weight_freq": 150000,
+    "rolling_average_length": 1000,
+    "stopping_patience": 10000,
+    "error_model": "DP",
+    "c_layers": [[128,3,2],[64,2,1],[32,2,1]],
+    "ff_layers": [[512,0.2]],
+    "max_timesteps": 3000000,
+    "volume_depth": 7,
+    "testing_length": 201,
+    "buffer_size": 100000,
+    "dueling": true,
+    "masked_greedy": false,
+    "static_decoder": false,
+    "use_tensorboard" : false,
+    "random_seed": 0,
+    "job_cores": 1,
+    "job_memory_per_cpu": 5000
+  },
+  "base_param_grid": {
+    "p_phys": 0.001,
+    "success_threshold": 100000,
+    "learning_starts_list": [1000],
+    "learning_rate_list": [0.0001],
+    "target_network_update_freq_list": [2500],
+    "gamma_list": [0.9],
+    "exploration_fraction_list": [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 700000, 800000, 1000000, 1200000],
+    "max_eps_list": [1.0],
+    "final_eps_list": [0.02],
+    "sim_time_per_ef": [22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22]
+  },
+  "controller_params": {
+    "threshold_dict": {"0.001": 1000, "0.003": 334, "0.005": 200, "0.007": 142, "0.009": 112, "0.011": 91, "0.013": 77, "0.015": 67, "0.017": 59},
+    "num_best_to_spawn_from": 1,
+    "p_phys_list": [0.001],
+    "success_threshold_list": [100000],
+    "simulation_time_limit_hours": 16,
+    "simulation_time_limit_hours_desc": "Amount of time we give to each simulation before marking it as timed out",            
+    "controller_param_grid": {           
+      "learning_starts_list": [1000],
+      "learning_rate_list": [0.0001, 0.00005, 0.00001, 0.000005],
+      "exploration_fraction_list": [100000],
+      "final_eps_list": [0.04, 0.02, 0.001],
+      "max_eps_list": [1.0, 0.5, 0.25],
+      "target_network_update_freq_list": [2500, 5000],
+      "gamma_list": [0.95, 0.99]
+    },
+    "controller_param_grid_desc": "Grid over which any spawned simulation will run"
+  }
+}
