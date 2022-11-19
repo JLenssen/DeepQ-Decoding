@@ -128,18 +128,15 @@ while keep_evaluating:
                              visualize=False, verbose=2, interval=10, single_cycle=False)
   results = testing_history.history["episode_lifetimes_rolling_avg"]
   final_result = results[-1:][0]
-  all_results[dict_key] = final_result
+  all_results[dict_key] = testing_history.history
 
   if abs(trained_at - err_rate) < 1e-6:
     results_file = os.path.join(variable_configs_folder, "results.p")
     pickle.dump(results, open(results_file, "wb"))
-    keep_evaluating = False
-
-  # to_beat = thresholds[count]
-  # if final_result < to_beat or count == (num_to_test - 1):
-  #   keep_evaluating = False
 
   count += 1
+  if count == num_to_test:
+    keep_evaluating = False
 
 all_results_file = os.path.join(variable_configs_folder, "all_results.p")
 pickle.dump(all_results, open(all_results_file, "wb"))
