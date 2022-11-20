@@ -15,14 +15,14 @@
     "max_timesteps": 3000000,
     "volume_depth": 9,
     "testing_length": 201,
-    "buffer_size": 100000,
+    "buffer_size": 750000,
     "dueling": true,
     "masked_greedy": false,
     "static_decoder": false,
     "use_tensorboard" : false,
     "random_seed": 0,
     "job_cores": 2,
-    "job_memory_per_cpu": 5000
+    "job_memory_per_cpu": 6000
   },
   "base_param_grid": {
     "p_phys": 0.001,
@@ -34,14 +34,14 @@
     "exploration_fraction_list": [1000000],
     "max_eps_list": [1.0],
     "final_eps_list": [0.04, 0.02, 0.001],
-    "sim_time_per_ef": [18]
+    "sim_time_per_ef": [22]
   },
   "controller_params": {
     "threshold_dict": {"0.001": 1000, "0.003": 334, "0.005": 200, "0.007": 142, "0.009": 112, "0.011": 91, "0.013": 77, "0.015": 67, "0.017": 59},
     "num_best_to_spawn_from": 1,
     "p_phys_list": [0.001, 0.003, 0.005, 0.007, 0.009, 0.011, 0.013, 0.015, 0.017],
     "success_threshold_list": [100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000],
-    "simulation_time_limit_hours": 18,
+    "simulation_time_limit_hours": 22,
     "simulation_time_limit_hours_desc": "Amount of time we give to each simulation before marking it as timed out",            
     "controller_param_grid": {           
       "learning_starts_list": [1000],

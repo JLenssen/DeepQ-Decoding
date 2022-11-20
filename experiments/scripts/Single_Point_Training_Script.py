@@ -52,7 +52,7 @@ else:
 
 # -------------------------------------------------------------------------------------------
 
-RANDOM_SEED = fixed_configs["random_seed"]
+RANDOM_SEED = all_configs["random_seed"]
 os.environ['PYTHONHASHSEED'] = str(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)

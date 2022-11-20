@@ -48,7 +48,7 @@ else:
 
 # -------------------------------------------------------------------------------------------
 
-RANDOM_SEED = fixed_configs["random_seed"]
+RANDOM_SEED = all_configs["random_seed"]
 os.environ['PYTHONHASHSEED'] = str(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
@@ -68,7 +68,6 @@ env = Surface_Code_Environment_Multi_Decoding_Cycles(d=all_configs["d"],
 
 # -------------------------------------------------------------------------------------------
 
-memory_file = os.path.join(variable_configs_folder, "final_memory.p")
 final_weights_file = os.path.join(
     variable_configs_folder, "final_dqn_weights.h5f")
 
