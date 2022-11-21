@@ -154,6 +154,44 @@ class CrossNoise():
       return error
 
 
+class SineNoise():
+  def __init__(self, d, p_phys, bias=0.0, steps_per_cycle=10, random_offset=False, context="DP"):
+    self.d = d
+    self.p_phys = p_phys
+    self.bias = bias
+    self.steps = 0
+    self.steps_per_cycle = steps_per_cycle
+    self.random_offset = np.zeros((self.d, self.d))
+
+    if random_offset:
+      self.random_offset = np.random.randint(low=0,high=steps_per_cycle, size=(self.d, self.d))
+
+    if not np.isclose(self.bias, 0.0):
+      self.p_phys = np.ones((self.d, self.d)) * p_phys 
+
+    print(f"Using Sine-Noise (Context: {context}, bias: {self.bias}, steps per cycle: {steps_per_cycle}, random offset: {random_offset}), with physical qubit error distribution: ")
+    print(self.p_phys)
+
+    # agent selects number of actions based on noise model
+    # if we want to test Sine Noise noise for DP trained agent, the number of
+    # actions won't match. Therefore we set a different context.
+    self.context = context
+
+  def get_error_model(self):
+    return self.context
+
+  def generate_error(self):
+      self.steps += 1
+      
+      error_probability = self.p_phys + self.bias * np.sin(2*np.pi*(self.steps+self.random_offset)/self.steps_per_cycle)
+      error_probability = error_probability.clip(min=0)
+      error = np.random.binomial(1, error_probability, (self.d, self.d))
+      error = error.astype(np.uint8)
+      error *= np.random.randint(low=1, high=4, size=(self.d,self.d), dtype=np.uint8)
+
+      return error
+
+
 class QuadrantNoise():
   def __init__(self, d, p_phys, quadrant=1,  bias=0.0, context="DP"):
     self.d = d
