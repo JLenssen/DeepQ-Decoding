@@ -14,12 +14,13 @@ class MatchingDecoder():
   MWPM decoder based on PyMatching.
   """
   
-  def __init__(self, parity_check_matrices: List[np.array]):
+  def __init__(self, parity_check_matrices: List[np.array], weights=None):
     """
     Decoder accepts list of parity check matrices. Unfortunately those
     have to be in order, meaning first X then Z matrix.
     """
     self.parity_check_matrices = parity_check_matrices
+    self.weights = weights
     self.M = []
     
     for H in self.parity_check_matrices:
@@ -31,6 +32,7 @@ class MatchingDecoder():
     Returns matching graph for a given parity check matrix
 
     :param: H: stabilizer parity check matrix
+    :param: randomize_weights: 
     """
 
     matching = Matching()
@@ -38,7 +40,12 @@ class MatchingDecoder():
     num_qubits = H.shape[1] # columns correspond to data qubits
     singletons = len(np.where(np.sum(H, axis=0) == 1)[0]) # num data qubits supported by only one stabilizer
     boundary_indices = [e + num_syndromes for e in range(singletons)] # indices for boundary nodes
-    weights = np.ones(num_qubits+1, dtype=np.uint8) # Manhattan distance
+
+    if self.weights is not None:
+      weights = self.weights # use weights passed from environment
+      print(f"Passed custom weights to MWPM! Using weights: \n{weights}")
+    else:
+      weights = np.ones(num_qubits+1, dtype=np.uint8) # Manhattan distance
     error_probabilities = np.ones(num_qubits+1, dtype=np.uint8) # Equi-probable errors
 
     # csr matrix explained: https://stackoverflow.com/questions/52299420/scipy-csr-matrix-understand-indptr
