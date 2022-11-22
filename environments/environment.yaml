@@ -1,9 +1,9 @@
-name: deepq-mkl
+name: deepq
 channels:
   - defaults
   - conda-forge
 dependencies:
-  - tensorflow=1.14.0=*mkl*
+  - tensorflow=1.14.0
   - keras=2.3.1
   - gym
   - matplotlib

@@ -43,7 +43,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
     """
 
 
-    def __init__(self, d=5, p_meas=0.01, noise_model=XNoise(5,0.001), use_Y=True, volume_depth=3, static_decoder=None):
+    def __init__(self, d=5, p_meas=0.01, noise_model=XNoise(5,0.001), use_Y=True, volume_depth=3, static_decoder=None, mwpm_weights=None):
 
         self.d = d
         self.p_meas= p_meas
@@ -105,7 +105,7 @@ class Surface_Code_Environment_Multi_Decoding_Cycles():
             parity_check_matrices = [get_parity_matrix(stab_list, self.syndromes, 3, self.d)]
             if self.error_model == "DP":
                 parity_check_matrices.append(get_parity_matrix(stab_list, self.syndromes, 1, self.d))
-            self.static_decoder = MatchingDecoder(parity_check_matrices)
+            self.static_decoder = MatchingDecoder(parity_check_matrices, mwpm_weights)
             self.static_decoder_is_mwpm = True
 
 
