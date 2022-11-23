@@ -1,0 +1,60 @@
+{
+  "config_dir" : "d5_mwpm_exp_stddev05",
+  "fixed_config": {
+    "d": 5,
+    "use_Y": false,
+    "train_freq": 1,
+    "batch_size": 32,
+    "print_freq": 500,
+    "save_weight_freq": 150000,
+    "rolling_average_length": 1000,
+    "stopping_patience": 10000,
+    "error_model": "DP",
+    "c_layers": [[128,3,2],[64,2,1],[32,2,1]],
+    "ff_layers": [[512,0.2]],
+    "max_timesteps": 3000000,
+    "volume_depth": 5,
+    "testing_length": 201,
+    "buffer_size": 50000,
+    "dueling": true,
+    "masked_greedy": false,
+    "static_decoder": false,
+    "use_tensorboard" : false,
+    "random_seed": 0,
+    "job_cores": 1,
+    "job_memory_per_cpu": 5000,
+    "mwpm_weights": [1.26426871, 0.19020166, 0.02723297, 1.47197809, 2.07280608, 1.02264001, 0.34094134, 1.24349835, 1.05896952, 0.78080251,
+    0.03541042, 1.24908162, 0.53581217, 1.17759463, 0.74494897, 0.7807593 , 1.28717501, 1.7292118 , 1.65805883, 1.14946895,
+    1.33450762, 1.06538256, 0.63356227, 1.08113643, 0.54704534, 1.0420841]
+  },
+  "base_param_grid": {
+    "p_phys": 0.001,
+    "success_threshold": 100000,
+    "learning_starts_list": [1000],
+    "learning_rate_list": [0.0001, 0.00005, 0.00001],
+    "target_network_update_freq_list": [5000],
+    "gamma_list": [0.95, 0.99],
+    "exploration_fraction_list": [200000],
+    "max_eps_list": [1.0],
+    "final_eps_list": [0.001],
+    "sim_time_per_ef": [16,16,16,16,16,16]
+  },
+  "controller_params": {
+    "threshold_dict": {"0.001": 1000, "0.003": 334, "0.005": 200, "0.007": 142, "0.009": 112, "0.011": 91, "0.013": 77, "0.015": 67, "0.017": 59},
+    "num_best_to_spawn_from": 1,
+    "p_phys_list":[0.001, 0.003, 0.005, 0.007, 0.009, 0.011, 0.013, 0.015, 0.017],
+    "success_threshold_list": [100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000],
+    "simulation_time_limit_hours": 16,
+    "simulation_time_limit_hours_desc": "Amount of time we give to each simulation before marking it as timed out",            
+    "controller_param_grid": {           
+      "learning_starts_list": [1000],
+      "learning_rate_list": [0.0001, 0.00005, 0.00001],
+      "exploration_fraction_list": [100000],
+      "final_eps_list": [0.001],
+      "max_eps_list": [1.0],
+      "target_network_update_freq_list": [5000],
+      "gamma_list": [0.95, 0.99]
+    },
+    "controller_param_grid_desc": "Grid over which any spawned simulation will run"
+  }
+}

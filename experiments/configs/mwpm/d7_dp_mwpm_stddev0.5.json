@@ -1,0 +1,62 @@
+{
+  "config_dir" : "d7_mwpm_exp_stddev05",
+  "fixed_config": {
+    "d": 7,
+    "use_Y": false,
+    "train_freq": 1,
+    "batch_size": 32,
+    "print_freq": 500,
+    "save_weight_freq": 150000,
+    "rolling_average_length": 1000,
+    "stopping_patience": 10000,
+    "error_model": "DP",
+    "c_layers": [[128,3,2],[64,2,1],[32,2,1]],
+    "ff_layers": [[512,0.2]],
+    "max_timesteps": 3000000,
+    "volume_depth": 7,
+    "testing_length": 201,
+    "buffer_size": 100000,
+    "dueling": true,
+    "masked_greedy": false,
+    "static_decoder": false,
+    "use_tensorboard" : false,
+    "random_seed": 0,
+    "job_cores": 1,
+    "job_memory_per_cpu": 5000,
+    "mwpm_weights": [1.42815027, 1.228629  , 0.50569735, 0.7742802 , 1.75606596, 0.99114524, 1.9111121 , 1.58727713, 1.29518478, 1.02029526,
+    0.43217767, 1.09474801, 0.97122238, 0.47518935, 0.24154031, 1.05738021, 0.67029852, 0.5051271 , 1.22259464, 0.77609261,
+    0.98519911, 1.54693994, 1.27577121, 0.57861707, 2.04071108, 0.73812829, 0.84317843, 0.61359178, 2.15976544, 1.58653068,
+    0.68928513, 0.86253676, 0.86819536, 0.98344056, 0.06825456, 0.65220898, 1.35633166, 1.52589492, 0.3603846 , 0.7423825 ,
+    0.89784123, 0.83610519, 1.01263429, 0.85324695, 2.00173732, 1.10435889, 1.23937708, 0.80721902, 1.02755438, 0.10349755]
+  },
+  "base_param_grid": {
+    "p_phys": 0.001,
+    "success_threshold": 100000,
+    "learning_starts_list": [1000],
+    "learning_rate_list": [0.0001, 0.00005, 0.00001],
+    "target_network_update_freq_list": [2500],
+    "gamma_list": [0.9, 0.95],
+    "exploration_fraction_list": [750000],
+    "max_eps_list": [1.0],
+    "final_eps_list": [0.02],
+    "sim_time_per_ef": [22,22,22,22,22,22]
+  },
+  "controller_params": {
+    "threshold_dict": {"0.001": 1000, "0.003": 334, "0.005": 200, "0.007": 142, "0.009": 112, "0.011": 91, "0.013": 77, "0.015": 67, "0.017": 59},
+    "num_best_to_spawn_from": 1,
+    "p_phys_list":[0.001, 0.003, 0.005, 0.007, 0.009, 0.011, 0.013, 0.015, 0.017],
+    "success_threshold_list": [100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000],
+    "simulation_time_limit_hours": 16,
+    "simulation_time_limit_hours_desc": "Amount of time we give to each simulation before marking it as timed out",            
+    "controller_param_grid": {           
+      "learning_starts_list": [1000],
+      "learning_rate_list": [0.0001, 0.00005, 0.00001],
+      "exploration_fraction_list": [750000],
+      "final_eps_list": [0.02],
+      "max_eps_list": [1.0],
+      "target_network_update_freq_list": [2500],
+      "gamma_list": [0.9, 0.95]
+    },
+    "controller_param_grid_desc": "Grid over which any spawned simulation will run"
+  }
+}
