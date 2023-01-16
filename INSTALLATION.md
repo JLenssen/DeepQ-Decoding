@@ -10,7 +10,7 @@ Environment can be installed with `mamba` [1] or `conda` (not recommended &rarr;
 
 To install the packages run
 ```
-mamba create env --file environment.yaml
+mamba env create --file environment.yaml
 mamba activate deepq
 ```
 
